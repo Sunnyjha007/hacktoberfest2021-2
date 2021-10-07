@@ -1,0 +1,221 @@
+//Code : Kruskal's Algorithm
+#include<bits/stdc++.h>
+using namespace std;
+class Edge{
+	public:
+	int source;
+	int dest;
+	int weight;
+	
+	Edge(){
+
+	}
+	Edge(int source,int dest,int weight){
+		this->source=source;
+		this->dest=dest;
+		this->weight=weight;
+	}
+};
+bool comp(Edge a , Edge b)
+{
+		return a.weight < b.weight;
+}
+int findparent(int * parent ,int v)
+{
+    if(parent[v]==v)
+    return v;
+    
+    return findparent(parent,parent[v]);
+}
+
+void kruskal(Edge *input, int n, int e)
+{
+    sort(input, input + e, comp);
+    int *parent = new int[n];
+    for (int i = 0; i < n; i++)
+    {
+        parent[i] = i;
+    }
+    Edge *output = new Edge[n - 1];
+    int count = 0;
+    int i = 0;
+    while (count != n - 1)
+    {
+        Edge currentedge = input[i];
+	   	int v1 = findparent(parent,currentedge.source);
+	   	int v2 = findparent(parent,currentedge.dest);
+	   	if(v1!=v2){
+		   	output[count] = currentedge;
+		   	count++;
+		   	parent[v1]=v2;
+	   	}
+	   	i++;
+    }
+    for (int i = 0; i < n - 1; i++)
+    {
+        if (output[i].source < output[i].dest)
+        {
+            cout << output[i].source << " " << output[i].dest << " " << output[i].weight << endl;
+        }
+        else
+        {
+            cout << output[i].dest << " " << output[i].source << " " << output[i].weight << endl;
+        }
+    }
+    return;
+}
+int main() {
+    // Write your code here
+    int n,e;
+    cin>>n>>e;
+    Edge *input = new Edge[e];
+    for(int i=0;i<e;i++){
+	    int s,d,w;
+	    cin>>s>>d>>w;
+	    input[i] = Edge(s,d,w);
+    }
+    kruskal(input,n,e);
+    delete[] input;
+    return 0;
+}
+//Code : Prim's Algorithm
+#include <bits/stdc++.h>
+using namespace std;
+int getMinVertex(bool*visited,int* weight,int V)
+{
+    int minVertex=-1;
+    for(int i=0;i<V;i++)
+    {
+        if(!visited[i] && ((minVertex==-1)||(weight[minVertex]>weight[i])))
+        {
+            minVertex=i;
+        }
+    }
+    return minVertex;
+}
+void prims(int** edges,int V)
+{
+    int* parent=new int[V];
+    int* weight=new int[V];
+    bool* visited=new bool[V];
+    for(int i=0;i<V;i++)
+    {
+        visited[i]=false;
+        weight[i]=INT_MAX;
+    }
+    weight[0]=0;
+    parent[0]=-1;
+    for(int i=0;i<V;i++)
+    {
+        int mini=getMinVertex(visited,weight,V);
+        visited[mini]=true;
+        for(int j=0;j<V;j++)
+        {
+            if(edges[mini][j]!=0)
+            {
+               if(weight[j]>edges[mini][j] && !visited[j])
+               {
+                   weight[j]=edges[mini][j];
+                   parent[j]=mini;
+               }
+            }
+        }
+    }
+    for(int i=1;i<V;i++)
+    {
+        if(parent[i]<i)
+        {
+            cout<<parent[i]<<" "<<i<<" "<<weight[i]<<endl;
+        }
+        else
+        {
+            cout<<i<<" "<<parent[i]<<" "<<weight[i]<<endl;
+        }
+    }
+    delete [] parent;
+    delete [] weight;
+    delete [] visited;
+}
+int main()
+{
+  int V, E;
+  cin >> V >> E;
+  int** edges=new int*[V];
+    for(int i=0;i<V;i++)
+    {
+        edges[i]=new int[V];
+        for(int j=0;j<V;j++)
+        {
+            edges[i][j]=0;
+        }
+    }
+    for(int i=0;i<E;i++)
+    {
+        int f,s,w;
+        cin>>f>>s>>w;
+        edges[f][s]=w;
+        edges[s][f]=w;
+    }
+    prims(edges,V);
+  return 0;
+}
+//Code : Dijkstra's Algorithm
+#include<iostream>
+#include<climits>
+using namespace std;
+int findminvertex(bool*visited,int *distance,int n){
+	int minV=-1;
+    for(int i=0;i<n;i++)
+    {
+        if(!visited[i] && (minV==-1 || distance[minV]>distance[i]))
+            minV=i;
+    }
+    return minV;
+}
+void dijkstra(int **edges,int n){
+      int *distance = new int[n];
+      bool *visited = new bool[n];
+      for(int i=0;i<n;i++){
+	      visited[i]=false;
+	      distance[i] = INT16_MAX;
+      }
+      distance[0]=0;
+      for(int i=0;i<n-1;i++){
+	      int minvetrex = findminvertex(visited,distance,n);
+	      visited[minvetrex] = true;
+	      for(int j=0;j<n;j++){
+		      if(edges[minvetrex][j]&&!visited[j]){
+			      if(distance[j]>edges[minvetrex][j]+distance[minvetrex]){
+				      distance[j]=edges[minvetrex][j]+distance[minvetrex];
+			      }
+		      }
+
+	          }
+	      }
+	      for(int i=0;i<n;i++){
+	       cout<<i<<" "<<distance[i]<<endl;      
+                 }
+}
+
+
+int main(){
+	int n,e;
+	cin>>n>>e;
+	int **edges = new int*[n];
+	for(int i=0;i<n;i++){
+		edges[i] = new int[n];
+		for(int j=0;j<n;j++){
+			edges[i][j] = 0; 
+		}
+	}
+	for(int i=0;i<e;i++){
+		int f,s,w;
+		cin>>f>>s>>w;
+		edges[f][s]=w;
+		edges[s][f]=w;
+	}
+	dijkstra(edges,n);
+	return 0;
+
+
+}
